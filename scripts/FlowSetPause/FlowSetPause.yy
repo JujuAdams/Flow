@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"FlowSetPause",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"FlowSetPause",
+  "parent":{
+    "name":"Flow",
+    "path":"folders/Flow.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

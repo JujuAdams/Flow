@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__FlowConstants",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__FlowConstants",
+  "parent":{
+    "name":"Flow",
+    "path":"folders/Flow.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

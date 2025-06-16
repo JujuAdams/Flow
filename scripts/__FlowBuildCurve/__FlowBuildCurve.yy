@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__FlowBuildCurve",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__FlowBuildCurve",
+  "parent":{
+    "name":"Builder",
+    "path":"folders/Flow/(System)/Builder.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"FlowGetFrames",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"FlowGetFrames",
+  "parent":{
+    "name":"Flow",
+    "path":"folders/Flow.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

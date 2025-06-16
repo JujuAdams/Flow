@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__FlowSystem",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__FlowSystem",
+  "parent":{
+    "name":"(System)",
+    "path":"folders/Flow/(System).yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

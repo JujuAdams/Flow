@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"FlowGo",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"FlowGo",
+  "parent":{
+    "name":"Flow",
+    "path":"folders/Flow.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

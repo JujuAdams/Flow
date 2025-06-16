@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"FlowExposeAnimCurve",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"FlowExposeAnimCurve",
+  "parent":{
+    "name":"Flow",
+    "path":"folders/Flow.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
