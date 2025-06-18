@@ -6,15 +6,15 @@
 #macro __FLOW_TOKEN_STATE_BLOCK_COMMENT  -2
 #macro __FLOW_TOKEN_STATE_LINE_COMMENT   -1
 #macro __FLOW_TOKEN_STATE_UNKNOWN         0
-#macro __FLOW_TOKEN_STATE_WORD            1
+#macro __FLOW_TOKEN_STATE_IDENIFIER       1
 #macro __FLOW_TOKEN_STATE_STRING          2
 #macro __FLOW_TOKEN_STATE_NUMBER          3
 #macro __FLOW_TOKEN_STATE_SYMBOL          4
-#macro __FLOW_TOKEN_STATE_LINE_BREAK      5
+#macro __FLOW_TOKEN_STATE_BREAK           5
 
 #macro __FLOW_TOKEN_NULL       (__FLOW_DEBUG_TOKENIZER? "tkn_nul" : -1)
 #macro __FLOW_TOKEN_SYMBOL     (__FLOW_DEBUG_TOKENIZER? "tkn_sym" :  0)
-#macro __FLOW_TOKEN_LINE_BREAK (__FLOW_DEBUG_TOKENIZER? "tkn_lbr" :  1)
+#macro __FLOW_TOKEN_BREAK      (__FLOW_DEBUG_TOKENIZER? "tkn_brk" :  1)
 #macro __FLOW_TOKEN_NUMBER     (__FLOW_DEBUG_TOKENIZER? "tkn_num" :  2)
 #macro __FLOW_TOKEN_STRING     (__FLOW_DEBUG_TOKENIZER? "tkn_str" :  3)
 #macro __FLOW_TOKEN_BOOL       (__FLOW_DEBUG_TOKENIZER? "tkn_bol" :  4)
@@ -26,6 +26,33 @@
 function __FlowTokenize(_string)
 {
     static _buffer = buffer_create(1024, buffer_grow, 1);
+    
+    static _nextStateLookupArray = (function()
+    {
+        var _array = array_create(127, __FLOW_TOKEN_STATE_UNKNOWN);
+        
+        _array[@ ord("\n")] = __FLOW_TOKEN_STATE_BREAK;                                           // 10
+        _array[@ ord("!" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 33
+        _array[@ ord("\"")] = __FLOW_TOKEN_STATE_STRING;                                          // 34
+        for(var _i = ord("#"); _i <= ord("-"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_SYMBOL;    // 35 ->  45
+        _array[@ ord("." )] = __FLOW_TOKEN_STATE_NUMBER;                                          // 46
+        // Forward slash is handled as a special case                                             // 47
+        for(var _i = ord("0"); _i <= ord("9"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_NUMBER;    // 48 ->  57
+        _array[@ ord(":" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 58
+        _array[@ ord(";" )] = __FLOW_TOKEN_STATE_BREAK;                                           // 59
+        for(var _i = ord("<"); _i <= ord("@"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_SYMBOL;    // 60 ->  64
+        for(var _i = ord("A"); _i <= ord("Z"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_IDENIFIER; // 65 ->  90
+        _array[@ ord("[" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 91
+        _array[@ ord("\\")] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 92
+        _array[@ ord("]" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 93
+        _array[@ ord("^" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 94
+        _array[@ ord("_" )] = __FLOW_TOKEN_STATE_IDENIFIER;                                       // 95
+        _array[@ ord("`" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 96
+        for(var _i = ord("a"); _i <= ord("z"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_IDENIFIER; // 97 -> 122
+        for(var _i = ord("{"); _i <= ord("~"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_SYMBOL;    //123 -> 126
+        
+        return _array;
+    })();
     
     var _tokensArray = [];
     
@@ -73,32 +100,26 @@ function __FlowTokenize(_string)
                 }
             break;
             
-            case __FLOW_TOKEN_STATE_LINE_BREAK:
-                array_push(_tokensArray,   __FLOW_TOKEN_LINE_BREAK, chr(_lastByte));
+            case __FLOW_TOKEN_STATE_BREAK:
+                array_push(_tokensArray,   __FLOW_TOKEN_BREAK, chr(_lastByte));
             break;
             
-            case __FLOW_TOKEN_STATE_WORD: //Vvariable / function
-                if ((_byte == ord("\n")) || (_byte == ord(";")))
-                {
-                    _nextState = __FLOW_TOKEN_STATE_LINE_BREAK;
-                }
-                else if ((_byte == ord("\"")) || (_byte == ord("%")) || (_byte == ord("&")) || (_byte == ord(")"))
-                     ||  (_byte == ord( "*")) || (_byte == ord("+")) || (_byte == ord(",")) || (_byte == ord("-"))
-                     ||  (_byte == ord("."))  || (_byte == ord("/")) || (_byte == ord(":")) || (_byte == ord("(")) || (_byte == ord(")"))
-                     ||  (_byte == ord("<"))  || (_byte == ord("=")) || (_byte == ord(">")) || (_byte == ord("?"))
-                     ||  (_byte == ord("["))  || (_byte == ord("]")) || (_byte == ord("^")) || (_byte == ord("_"))
-                     ||  (_byte == ord("{"))  || (_byte == ord("|")) || (_byte == ord("}")) || (_byte == ord("~")))
+            case __FLOW_TOKEN_STATE_IDENIFIER: //Variable / function
+                if (_byte == ord("."))
                 {
                     _nextState = __FLOW_TOKEN_STATE_SYMBOL;
                 }
-                else if (_byte > 32) //Everything is permitted, except non-printable stuff
+                else
                 {
-                    _nextState = __FLOW_TOKEN_STATE_WORD;
+                    var _nextState = (_byte < 127)? _nextStateLookupArray[_byte] : __FLOW_TOKEN_STATE_UNKNOWN;
+                    if (_nextState == __FLOW_TOKEN_STATE_NUMBER)
+                    {
+                        _nextState = __FLOW_TOKEN_STATE_IDENIFIER;
+                    }
                 }
                 
                 if (_state != _nextState)
                 {
-                    //Just a normal keyboard/variable
                     buffer_poke(_buffer, _b, buffer_u8, 0);
                     buffer_seek(_buffer, buffer_seek_start, _readStart);
                     var _read = buffer_read(_buffer, buffer_string);
@@ -174,7 +195,7 @@ function __FlowTokenize(_string)
                     catch(_error)
                     {
                         __FlowError($"Could not convert \"{_read}\" to a number");
-                        return undefined;
+                        break;
                     }
                     
                     array_push(_tokensArray,   __FLOW_TOKEN_NUMBER, _read);
@@ -198,11 +219,11 @@ function __FlowTokenize(_string)
                         _nextState = __FLOW_TOKEN_STATE_SYMBOL; //Symbol
                     }
                 }
-                else if ((_byte == 38) && (_lastByte == 38)) //&
+                else if ((_byte == 38) && (_lastByte == 38)) // &&
                 {
                     _nextState = __FLOW_TOKEN_STATE_SYMBOL; //Symbol
                 }
-                else if ((_byte == 124) && (_lastByte == 124)) //|
+                else if ((_byte == 124) && (_lastByte == 124)) // ||
                 {
                     _nextState = __FLOW_TOKEN_STATE_SYMBOL; //Symbol
                 }
@@ -223,31 +244,7 @@ function __FlowTokenize(_string)
         
         if (_changeState && (_nextState == __FLOW_TOKEN_STATE_UNKNOWN))
         {
-            if (_byte == ord("\n"))
-            {
-                _nextState = __FLOW_TOKEN_STATE_LINE_BREAK;
-            }
-            if (_byte == 33) //!
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if ((_byte == 34) && (_lastByte != 92)) //"
-            {
-                _nextState = __FLOW_TOKEN_STATE_STRING; //Quote-delimited String
-            }
-            else if ((_byte == 37) || (_byte == 38)) //% &
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if ((_byte == 40) || (_byte == 41)) //( )
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if ((_byte >= 42) && (_byte <= 46)) //* + , - .
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if (_byte == 47) // /
+            if (_byte == 47) // /
             {
                 var _nextByte = buffer_peek(_buffer, _b+1, buffer_u8);
                 if (_nextByte == 47) // /
@@ -263,49 +260,9 @@ function __FlowTokenize(_string)
                     _nextState = __FLOW_TOKEN_STATE_SYMBOL;
                 }
             }
-            else if ((_byte >= 48) && (_byte <= 57)) //0 1 2 3 4 5 6 7 8 9
+            else if (_byte < 127)
             {
-                _nextState = __FLOW_TOKEN_STATE_NUMBER;
-            }
-            else if (_byte == 58) //:
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if (_byte == 59) //;
-            {
-                _nextState = __FLOW_TOKEN_STATE_LINE_BREAK;
-            }
-            else if ((_byte >= 60) && (_byte <= 63))  //< = > ?
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if ((_byte >= 65) && (_byte <= 90)) //a b c...x y z
-            {
-                _nextState = __FLOW_TOKEN_STATE_WORD;
-            }
-            else if (_byte == 91) //[
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if (_byte == 93) //]
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if (_byte == 94) //^
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
-            }
-            else if (_byte == 95) //_
-            {
-                _nextState = __FLOW_TOKEN_STATE_WORD;
-            }
-            else if ((_byte >= 97) && (_byte <= 122)) //A B C...X Y Z
-            {
-                _nextState = __FLOW_TOKEN_STATE_WORD;
-            }
-            else if ((_byte >= 123) && (_byte <= 126)) // { | } ~
-            {
-                _nextState = __FLOW_TOKEN_STATE_SYMBOL;
+                _nextState = _nextStateLookupArray[_byte];
             }
         }
         
@@ -317,7 +274,7 @@ function __FlowTokenize(_string)
         ++_b;
     }
     
-    array_push(_tokensArray, __FLOW_TOKEN_LINE_BREAK, undefined);
+    array_push(_tokensArray, __FLOW_TOKEN_BREAK, undefined);
     array_push(_tokensArray, __FLOW_TOKEN_NULL, undefined);
     
     return _tokensArray;

@@ -8,7 +8,7 @@ if (keyboard_check_pressed(vk_space))
     time 100
     dx = %0%
     dy = 0
-    ");
+    ", [0]);
     
     //FlowGo(@"
     //dx,dy = 0

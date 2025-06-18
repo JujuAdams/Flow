@@ -68,7 +68,7 @@ function __FlowMethodize(_tokenArray)
             
             while(not __Check(__FLOW_TOKEN_NULL))
             {
-                if (not __CheckAndConsume(__FLOW_TOKEN_LINE_BREAK))
+                if (not __CheckAndConsume(__FLOW_TOKEN_BREAK))
                 {
                     var _statement = __Statement();
                     
@@ -80,7 +80,7 @@ function __FlowMethodize(_tokenArray)
                     
                     array_push(_statementArray, _statement);
                     
-                    if (not __CheckAndConsume(__FLOW_TOKEN_LINE_BREAK))
+                    if (not __CheckAndConsume(__FLOW_TOKEN_BREAK))
                     {
                         __FlowError($"Unexpected token: type={__currentType} \"{__currentContent}\"");
                     }
