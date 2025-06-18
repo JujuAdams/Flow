@@ -141,7 +141,6 @@ function __FlowTokenize(_string)
                     }
                     
                     _new = true;
-                    _nextState = __FLOW_TOKEN_STATE_UNKNOWN;
                 }
             break;
             
