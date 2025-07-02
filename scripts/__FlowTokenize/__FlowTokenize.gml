@@ -27,6 +27,9 @@ function __FlowTokenize(_string)
 {
     static _buffer = buffer_create(1024, buffer_grow, 1);
     
+    //This function defines a look-up table. The table will return the token state when encountering
+    //the ASCII character *in isolation*. Characters such as `/` or `.` have special case handling to
+    //handle different behaviours, such as comments or variable access.
     static _nextStateLookupArray = (function()
     {
         var _array = array_create(127, __FLOW_TOKEN_STATE_UNKNOWN);
@@ -36,7 +39,7 @@ function __FlowTokenize(_string)
         _array[@ ord("\"")] = __FLOW_TOKEN_STATE_STRING;                                          // 34
         for(var _i = ord("#"); _i <= ord("-"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_SYMBOL;    // 35 ->  45
         _array[@ ord("." )] = __FLOW_TOKEN_STATE_NUMBER;                                          // 46
-        // Forward slash is handled as a special case                                             // 47
+        _array[@ ord("/" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 47
         for(var _i = ord("0"); _i <= ord("9"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_NUMBER;    // 48 ->  57
         _array[@ ord(":" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 58
         _array[@ ord(";" )] = __FLOW_TOKEN_STATE_BREAK;                                           // 59
@@ -112,6 +115,8 @@ function __FlowTokenize(_string)
                 else
                 {
                     var _nextState = (_byte < 127)? _nextStateLookupArray[_byte] : __FLOW_TOKEN_STATE_UNKNOWN;
+                    
+                    //If we have letters before numbers then the numbers are considered part of the variable name
                     if (_nextState == __FLOW_TOKEN_STATE_NUMBER)
                     {
                         _nextState = __FLOW_TOKEN_STATE_IDENIFIER;
@@ -120,6 +125,7 @@ function __FlowTokenize(_string)
                 
                 if (_state != _nextState)
                 {
+                    //Pop the string and store it as a token
                     buffer_poke(_buffer, _b, buffer_u8, 0);
                     buffer_seek(_buffer, buffer_seek_start, _readStart);
                     var _read = buffer_read(_buffer, buffer_string);
@@ -151,6 +157,7 @@ function __FlowTokenize(_string)
                     
                     if (_readStart < _b - 1)
                     {
+                        //Pop the string and store it as a token
                         buffer_poke(_buffer, _b, buffer_u8, 0);
                         buffer_seek(_buffer, buffer_seek_start, _readStart+1);
                         var _read = buffer_read(_buffer, buffer_string);
@@ -158,10 +165,11 @@ function __FlowTokenize(_string)
                     }
                     else
                     {
+                        //Zero length string
                         var _read = "";
                     }
                     
-                    array_push(_tokensArray,   __FLOW_TOKEN_STRING, _read);
+                    array_push(_tokensArray, __FLOW_TOKEN_STRING, _read);
                     _new = true;
                 }
                 else
@@ -182,6 +190,7 @@ function __FlowTokenize(_string)
                 
                 if (_state != _nextState)
                 {
+                    //Pop the string, try it convert it to a number, and store it as a token
                     buffer_poke(_buffer, _b, buffer_u8, 0);
                     buffer_seek(_buffer, buffer_seek_start, _readStart);
                     var _read = buffer_read(_buffer, buffer_string);
@@ -193,6 +202,7 @@ function __FlowTokenize(_string)
                     }
                     catch(_error)
                     {
+                        show_debug_message(_error);
                         __FlowError($"Could not convert \"{_read}\" to a number");
                         break;
                     }
@@ -203,32 +213,55 @@ function __FlowTokenize(_string)
                 }
             break;
             
-            case __FLOW_TOKEN_STATE_SYMBOL: //Symbol
+            case __FLOW_TOKEN_STATE_SYMBOL:
+                //We usually default to treating consecutive symbols are separate (consider `-(-2))`). The following
+                //checks will combine glyphs together
                 if (_byte == 61) //=
                 {
                     if ((_lastByte == 33)  // !=
                     ||  (_lastByte == 42)  // *=
                     ||  (_lastByte == 43)  // +=
-                    ||  (_lastByte == 45)  // +=
+                    ||  (_lastByte == 45)  // -=
                     ||  (_lastByte == 47)  // /=
                     ||  (_lastByte == 60)  // <=
                     ||  (_lastByte == 61)  // ==
                     ||  (_lastByte == 62)) // >=
                     {
-                        _nextState = __FLOW_TOKEN_STATE_SYMBOL; //Symbol
+                        _nextState = __FLOW_TOKEN_STATE_SYMBOL;
                     }
                 }
                 else if ((_byte == 38) && (_lastByte == 38)) // &&
                 {
-                    _nextState = __FLOW_TOKEN_STATE_SYMBOL; //Symbol
+                    _nextState = __FLOW_TOKEN_STATE_SYMBOL;
+                }
+                else if ((_byte == 43) && (_lastByte == 43)) // ++
+                {
+                    _nextState = __FLOW_TOKEN_STATE_SYMBOL;
+                }
+                else if ((_byte == 43) && (_lastByte == 43)) // --
+                {
+                    _nextState = __FLOW_TOKEN_STATE_SYMBOL;
                 }
                 else if ((_byte == 124) && (_lastByte == 124)) // ||
                 {
-                    _nextState = __FLOW_TOKEN_STATE_SYMBOL; //Symbol
+                    _nextState = __FLOW_TOKEN_STATE_SYMBOL;
+                }
+                else if ((_byte == 60) && (_lastByte == 60)) // <<
+                {
+                    _nextState = __FLOW_TOKEN_STATE_SYMBOL;
+                }
+                else if ((_byte == 62) && (_lastByte == 62)) // >>
+                {
+                    _nextState = __FLOW_TOKEN_STATE_SYMBOL;
+                }
+                else if ((_byte == 94) && (_lastByte == 94)) // ^^
+                {
+                    _nextState = __FLOW_TOKEN_STATE_SYMBOL;
                 }
                 
                 if (_state != _nextState)
                 {
+                    //Pop the string and store it as a token
                     buffer_poke(_buffer, _b, buffer_u8, 0);
                     buffer_seek(_buffer, buffer_seek_start, _readStart);
                     var _read = buffer_read(_buffer, buffer_string);
