@@ -3,6 +3,7 @@
 if (keyboard_check_pressed(vk_space))
 {
     FlowGo(@"
+    a.b.c = 34
     dx = 0
     dy = functionTest()
     time 100

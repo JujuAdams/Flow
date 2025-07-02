@@ -1,6 +1,6 @@
 // Feather disable all
 
-#macro __FLOW_DEBUG_TOKENIZER  false
+#macro __FLOW_DEBUG_TOKENIZER  true
 
 function __FlowSystem()
 {

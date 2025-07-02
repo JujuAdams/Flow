@@ -12,14 +12,14 @@
 #macro __FLOW_TOKEN_STATE_SYMBOL          4
 #macro __FLOW_TOKEN_STATE_BREAK           5
 
-#macro __FLOW_TOKEN_NULL       (__FLOW_DEBUG_TOKENIZER? "tkn_nul" : -1)
-#macro __FLOW_TOKEN_SYMBOL     (__FLOW_DEBUG_TOKENIZER? "tkn_sym" :  0)
-#macro __FLOW_TOKEN_BREAK      (__FLOW_DEBUG_TOKENIZER? "tkn_brk" :  1)
-#macro __FLOW_TOKEN_NUMBER     (__FLOW_DEBUG_TOKENIZER? "tkn_num" :  2)
-#macro __FLOW_TOKEN_STRING     (__FLOW_DEBUG_TOKENIZER? "tkn_str" :  3)
-#macro __FLOW_TOKEN_BOOL       (__FLOW_DEBUG_TOKENIZER? "tkn_bol" :  4)
-#macro __FLOW_TOKEN_UNDEFINED  (__FLOW_DEBUG_TOKENIZER? "tkn_und" :  5)
-#macro __FLOW_TOKEN_IDENTIFIER (__FLOW_DEBUG_TOKENIZER? "tkn_idt" :  6)
+#macro __FLOW_TOKEN_NULL       (__FLOW_DEBUG_TOKENIZER? "null " : -1)
+#macro __FLOW_TOKEN_SYMBOL     (__FLOW_DEBUG_TOKENIZER? "sym  " :  0)
+#macro __FLOW_TOKEN_BREAK      (__FLOW_DEBUG_TOKENIZER? "brk  " :  1)
+#macro __FLOW_TOKEN_NUMBER     (__FLOW_DEBUG_TOKENIZER? "numb " :  2)
+#macro __FLOW_TOKEN_STRING     (__FLOW_DEBUG_TOKENIZER? "strg " :  3)
+#macro __FLOW_TOKEN_BOOL       (__FLOW_DEBUG_TOKENIZER? "bool " :  4)
+#macro __FLOW_TOKEN_UNDEFINED  (__FLOW_DEBUG_TOKENIZER? "undf " :  5)
+#macro __FLOW_TOKEN_IDENTIFIER (__FLOW_DEBUG_TOKENIZER? "ident" :  6)
 
 #macro __FLOW_TOKENIZER_STRIDE  2
 
