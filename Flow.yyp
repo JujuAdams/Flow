@@ -24,6 +24,7 @@
   "resources":[
     {"id":{"name":"__FlowCurveLinear","path":"animcurves/__FlowCurveLinear/__FlowCurveLinear.yy",},},
     {"id":{"name":"acTest","path":"animcurves/acTest/acTest.yy",},},
+    {"id":{"name":"Note1","path":"notes/Note1/Note1.yy",},},
     {"id":{"name":"oMain","path":"objects/oMain/oMain.yy",},},
     {"id":{"name":"rMain","path":"rooms/rMain/rMain.yy",},},
     {"id":{"name":"__FlowBuildCurve","path":"scripts/__FlowBuildCurve/__FlowBuildCurve.yy",},},
