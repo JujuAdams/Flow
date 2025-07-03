@@ -1,12 +1,13 @@
 // Feather disable all
 
+/// @param [name]
 /// @param string
 
-function __FlowCompile(_string)
+function FlowCompile(_name = undefined, _string)
 {
     static _precacheMap = __FlowSystem().__precacheMap;
     
-    var _program = _precacheMap[? _string];
+    var _program = _precacheMap[? _string] ?? _precacheMap[? _name];
     if (_program != undefined) return _program;
     
     var _tokenArray = __FlowTokenize(_string);
@@ -21,8 +22,13 @@ function __FlowCompile(_string)
         }
     }
     
-    var _block = __FlowMethodize(_tokenArray);
-    _precacheMap[? _string] = _block;
+    var _program = __FlowMethodize(_tokenArray);
+    _precacheMap[? _string] = _program;
     
-    return _block;
+    if (_name != undefined)
+    {
+        _precacheMap[? _name] = _program;
+    }
+    
+    return _program;
 }

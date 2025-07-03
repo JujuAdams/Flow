@@ -2,5 +2,5 @@
 
 if (keyboard_check_pressed(vk_space))
 {
-    FlowGo("functionTest(%0%); time 20fr; functionTest(%1%)", [20, 30]);
+    FlowGo("x,y = 0 >> acTest 20fr = 10, 20 >> linear 120ms = 20", [20, 30]);
 }

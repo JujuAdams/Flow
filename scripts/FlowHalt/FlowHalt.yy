@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"FlowGetFrames",
+  "%Name":"FlowHalt",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"FlowGetFrames",
+  "name":"FlowHalt",
   "parent":{
     "name":"Flow",
     "path":"folders/Flow.yy",

@@ -1,7 +1,7 @@
 // Feather disable all
 
-#macro __FLOW_DEBUG_TOKENIZER  true
-#macro __FLOW_DEBUG_PROGRAM_BUILDER  true
+#macro __FLOW_DEBUG_TOKENIZER        false
+#macro __FLOW_DEBUG_PROGRAM_BUILDER  false
 
 function __FlowSystem()
 {
@@ -21,9 +21,6 @@ function __FlowSystem()
         __executionContext = {
             __paramArray: [],
         };
-        
-        __buildContext = undefined;
-        __buildContextArray = [];
         
         __updateArray = [];
         

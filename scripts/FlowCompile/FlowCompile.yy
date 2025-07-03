@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"__FlowCompile",
+  "%Name":"FlowCompile",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__FlowCompile",
+  "name":"FlowCompile",
   "parent":{
-    "name":"(System)",
-    "path":"folders/Flow/(System).yy",
+    "name":"Flow",
+    "path":"folders/Flow.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

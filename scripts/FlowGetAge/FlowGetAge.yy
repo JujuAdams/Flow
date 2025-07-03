@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"__FlowClassProgram",
+  "%Name":"FlowGetAge",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__FlowClassProgram",
+  "name":"FlowGetAge",
   "parent":{
-    "name":"(System)",
-    "path":"folders/Flow/(System).yy",
+    "name":"Flow",
+    "path":"folders/Flow.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

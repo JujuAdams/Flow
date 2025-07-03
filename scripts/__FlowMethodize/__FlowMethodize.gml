@@ -114,9 +114,9 @@ function __FlowMethodize(_tokenArray)
             return method({
                 __statementArray: _statementArray,
             },
-            function()
+            function(_scope)
             {
-                FlowProgBegin();
+                FlowProgBegin(_scope);
                 
                 var _array = __statementArray;
                 var _i = 0;

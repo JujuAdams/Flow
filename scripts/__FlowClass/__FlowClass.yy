@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"FlowStopInPlace",
+  "%Name":"__FlowClass",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"FlowStopInPlace",
+  "name":"__FlowClass",
   "parent":{
-    "name":"Flow",
-    "path":"folders/Flow.yy",
+    "name":"(System)",
+    "path":"folders/Flow/(System).yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",
