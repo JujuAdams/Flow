@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"FlowProgAwaitAll",
+  "%Name":"__FlowClassInstrVector",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"FlowProgAwaitAll",
+  "name":"__FlowClassInstrVector",
   "parent":{
-    "name":"Program",
-    "path":"folders/Flow/Program.yy",
+    "name":"Classes",
+    "path":"folders/Flow/(System)/Classes.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

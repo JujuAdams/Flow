@@ -4,27 +4,44 @@
 ///      probably don't want to build programs manually. Instead, you should use `FlowGo()` or
 ///      `FlowCompile()`.
 /// 
-/// Increments the program's internal clock for the purposes of adding instructions. Any
-/// instructions that follow `FlowProgSetTime()` will use the clock time as its basis.
+/// Increments the program's internal clock for the purposes of adding instructions.
 /// 
 /// N.B. By default, the time units for this function is measured in frames. If you choose to use
 ///      milliseconds then the millisecond value will be converted to frames using
 ///      `FLOW_TARGET_FRAME_TIME`.
 /// 
-/// @param time
+/// @param delay
 /// @param [useMilliseconds=false]
 
-function FlowProgDelay(_time, _useMilliseconds = false)
+function FlowProgDelay(_delay, _useMilliseconds = false)
 {
     static _system = __FlowSystem();
     
-    if (_useMilliseconds)
+    if (_delay < 0)
     {
-        _time = __FlowMsToFrames(_time);
+        __FlowError("Cannot use a negative delay");
     }
     
     if (__FLOW_DEBUG_PROGRAM_BUILDER)
     {
-        show_debug_message($"FlowProgDelay({_time})");
+        show_debug_message($"FlowProgDelay({_delay})");
+    }
+    
+    if (_useMilliseconds)
+    {
+        _delay = __FlowMsToFrames(_delay);
+    }
+    
+    _delay = ceil(_delay);
+    
+    if (_delay <= 0)
+    {
+        return;
+    }
+    
+    with(_system.__programCurrent)
+    {
+        array_push(__instructionArray, new __FlowClassInstrDelay(_delay));
+        __ClearTargets();
     }
 }

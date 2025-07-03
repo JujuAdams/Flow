@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"FlowProgSetTime",
+  "%Name":"__FlowClassInstrAwait",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"FlowProgSetTime",
+  "name":"__FlowClassInstrAwait",
   "parent":{
-    "name":"Program",
-    "path":"folders/Flow/Program.yy",
+    "name":"Classes",
+    "path":"folders/Flow/(System)/Classes.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

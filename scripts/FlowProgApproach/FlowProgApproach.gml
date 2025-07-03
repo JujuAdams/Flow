@@ -21,4 +21,6 @@ function FlowProgApproach(_speedOrArray, _targetOrArray)
     {
         show_debug_message($"FlowProgApproach({_speedOrArray}, {_targetOrArray})");
     }
+    
+    _system.__programCurrent.__AddApproach(_speedOrArray, _targetOrArray);
 }

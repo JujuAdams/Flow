@@ -12,7 +12,7 @@ function FlowProgEnd()
     static _system = __FlowSystem();
     
     var _program = _system.__programCurrent;
-    _program.__BuildEnd();
+    _program.__buildTargetDict = undefined;
     
     _system.__programCurrent = array_pop(_system.__programStack);
     

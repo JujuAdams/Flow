@@ -138,35 +138,12 @@ function __FlowMethodize(_tokenArray)
         }
         
         //Statements are "lines" of instructions. Lines can only start with certain tokens:
-        // `time <duration>`
         // `delay <duration>`
-        // `await` `await all` `await any`
+        // `await`
         // `function(<arguments>)`
         // `<tween line>`
         static __Statement = function()
         {
-            ////////
-            // `time <duration>`
-            ////////
-            if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "time"))
-            {
-                var _value = __Duration();
-                if (not is_ptr(_value))
-                {
-                    return method({
-                        __value: __EnsureFunc(_value),
-                    },
-                    function()
-                    {
-                        FlowProgSetTime(__value(), false);
-                    });
-                }
-                else
-                {
-                    return pointer_null;
-                }
-            }
-            
             ////////
             // `delay <duration>`
             ////////
@@ -190,28 +167,14 @@ function __FlowMethodize(_tokenArray)
             }
             
             ////////
-            // `await ...`
+            // `await`
             ////////
             if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "await"))
             {
-                if (__CheckAndConsume(__FLOW_TOKEN_BREAK) || __CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "all"))
+                return function()
                 {
-                    return function()
-                    {
-                        FlowProgAwaitAll();
-                    };
-                }
-                else if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "any"))
-                {
-                    return function()
-                    {
-                        FlowProgAwaitAny();
-                    };
-                }
-                else
-                {
-                    return pointer_null;
-                }
+                    FlowProgAwait();
+                };
             }
             
             ///////

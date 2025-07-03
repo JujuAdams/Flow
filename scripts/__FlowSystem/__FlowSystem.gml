@@ -3,6 +3,10 @@
 #macro __FLOW_DEBUG_TOKENIZER        false
 #macro __FLOW_DEBUG_PROGRAM_BUILDER  false
 
+#macro __FLOW_RETURN_WAIT      0
+#macro __FLOW_RETURN_PENDING   1
+#macro __FLOW_RETURN_COMPLETE  2
+
 function __FlowSystem()
 {
     static _system = undefined;

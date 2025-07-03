@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"__FlowClass",
+  "%Name":"__FlowClassInstrDelay",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__FlowClass",
+  "name":"__FlowClassInstrDelay",
   "parent":{
     "name":"Classes",
     "path":"folders/Flow/(System)/Classes.yy",

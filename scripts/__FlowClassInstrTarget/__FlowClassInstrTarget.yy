@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"FlowProgAwaitAny",
+  "%Name":"__FlowClassInstrTarget",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"FlowProgAwaitAny",
+  "name":"__FlowClassInstrTarget",
   "parent":{
-    "name":"Program",
-    "path":"folders/Flow/Program.yy",
+    "name":"Classes",
+    "path":"folders/Flow/(System)/Classes.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -21,7 +21,12 @@ function FlowProgTween(_curve = undefined, _duration, _targetOrArray, _useMillis
 {
     static _system = __FlowSystem();
     
-    _duration = __FlowMsToFrames(_duration);
+    if (_useMilliseconds)
+    {
+        _duration = __FlowMsToFrames(_duration);
+    }
+    
+    _duration = ceil(_duration);
     
     _targetOrArray = __FlowEnsureArray(_targetOrArray);
     
@@ -29,4 +34,6 @@ function FlowProgTween(_curve = undefined, _duration, _targetOrArray, _useMillis
     {
         show_debug_message($"FlowProgTween({_curve}, {_duration}, {_targetOrArray})");
     }
+    
+    _system.__programCurrent.__AddTween(_curve, _duration, _targetOrArray);
 }

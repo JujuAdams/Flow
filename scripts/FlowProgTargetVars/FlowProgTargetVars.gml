@@ -19,4 +19,6 @@ function FlowProgTargetVars(_variableOrArray)
     {
         show_debug_message($"FlowProgTargetVars({_variableOrArray})");
     }
+    
+    _system.__programCurrent.__SetTarget(_variableOrArray, false);
 }

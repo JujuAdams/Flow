@@ -5,7 +5,7 @@
 ///      `FlowCompile()`.
 /// 
 /// Executes a function using the given arguments. The time of execution is determined by the clock
-/// time, as set by `FlowProgSetTime()` or `FlowProgAwaitAll()` etc.
+/// time.
 /// 
 /// @param function
 /// @param argumentArray
@@ -20,4 +20,6 @@ function FlowProgExecute(_function, _argumentArray)
     {
         show_debug_message($"FlowProgExecute({_function}, {_argumentArray})");
     }
+    
+    _system.__programCurrent.__AddExecute(_function, _argumentArray);
 }

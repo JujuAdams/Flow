@@ -17,6 +17,8 @@ function FlowProgTargetVector(_variableOrArray)
     
     if (__FLOW_DEBUG_PROGRAM_BUILDER)
     {
-        show_debug_message($"FlowProgTargetVector({_array})");
+        show_debug_message($"FlowProgTargetVector({_variableOrArray})");
     }
+    
+    _system.__programCurrent.__SetTarget(_variableOrArray, true);
 }
