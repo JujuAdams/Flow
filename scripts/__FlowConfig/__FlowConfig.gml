@@ -2,6 +2,4 @@
 
 #macro FLOW_CONTAINER  "__flowContainer"
 
-#macro FLOW_TARGET_FPS  60
-
-#macro FLOW_SAFE_PARAM_ACCESS  true
+#macro FLOW_TARGET_FRAME_TIME  16.666

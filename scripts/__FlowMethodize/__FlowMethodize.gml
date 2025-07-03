@@ -243,7 +243,7 @@ function __FlowMethodize(_tokenArray)
             
             //Accept any number of following process definitions, at least until we reach a break token
             var _processArray = [];
-            while(not __CheckAndConsume(__FLOW_TOKEN_BREAK))
+            while(not __Check(__FLOW_TOKEN_BREAK))
             {
                 if (not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ">>")) return pointer_null;
                 
@@ -289,7 +289,7 @@ function __FlowMethodize(_tokenArray)
                 return pointer_null;
             }
             
-            var _array  = [__Consume()];
+            var _array = [__EnsureFunc(__Consume())];
             
             if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "&"))
             {
@@ -298,14 +298,15 @@ function __FlowMethodize(_tokenArray)
                 do
                 {
                     var _reference = __Reference();
-                    if (not is_ptr(_reference)) return pointer_null;
-                
-                    array_push(_array, _reference);
+                    if (is_ptr(_reference)) return pointer_null;
+                    
+                    array_push(_array, __EnsureFunc(_reference));
                 }
                 until(not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, "&"));
                 
                 return method({
-                    __array: _array,
+                    __array:  _array,
+                    __length: array_length(_array),
                 },
                 function()
                 {
@@ -314,7 +315,7 @@ function __FlowMethodize(_tokenArray)
                     var _i = 0;
                     repeat(__length)
                     {
-                        _array[_i] = __array[_i]();
+                        _array[@ _i] = __array[_i]();
                         ++_i;
                     }
                     
@@ -329,15 +330,16 @@ function __FlowMethodize(_tokenArray)
                     do
                     {
                         var _reference = __Reference();
-                        if (not is_ptr(_reference)) return pointer_null;
+                        if (is_ptr(_reference)) return pointer_null;
                         
-                        array_push(_array, _reference);
+                        array_push(_array, __EnsureFunc(_reference));
                     }
                     until(not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ","));
                 }
                 
                 return method({
-                    __array: _array,
+                    __array:  _array,
+                    __length: array_length(_array),
                 },
                 function()
                 {
@@ -346,7 +348,7 @@ function __FlowMethodize(_tokenArray)
                     var _i = 0;
                     repeat(__length)
                     {
-                        _array[_i] = __array[_i]();
+                        _array[@ _i] = __array[_i]();
                         ++_i;
                     }
                     
@@ -378,7 +380,7 @@ function __FlowMethodize(_tokenArray)
             if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "+"))
             {
                 var _approachSpeed = __MultiExpression();
-                if (not is_ptr(_approachSpeed)) return pointer_null;
+                if (is_ptr(_approachSpeed)) return pointer_null;
             }
             else
             {
@@ -414,8 +416,8 @@ function __FlowMethodize(_tokenArray)
             if (_approachSpeed != undefined)
             {
                 return method({
-                    __approachSpeed: _approachSpeed,
-                    __target:        _target,
+                    __approachSpeed: __EnsureFunc(_approachSpeed),
+                    __target:        __EnsureFunc(_target),
                 },
                 function()
                 {
@@ -425,9 +427,9 @@ function __FlowMethodize(_tokenArray)
             else
             {
                 return method({
-                    __curve:    _curve,
-                    __duration: _duration,
-                    __target:   _target,
+                    __curve:    __EnsureFunc(_curve),
+                    __duration: __EnsureFunc(_duration),
+                    __target:   __EnsureFunc(_target),
                 },
                 function()
                 {
@@ -460,7 +462,7 @@ function __FlowMethodize(_tokenArray)
                 },
                 function()
                 {
-                    return ceil(__value() / FLOW_TARGET_FPS);
+                    return ceil(__value() / FLOW_TARGET_FRAME_TIME);
                 });
             }
             else
@@ -499,9 +501,9 @@ function __FlowMethodize(_tokenArray)
             do
             {
                 var _expression = __Expression();
-                if (not is_ptr(_expression)) return pointer_null;
+                if (is_ptr(_expression)) return pointer_null;
                 
-                array_push(_array, _expression);
+                array_push(_array, __EnsureFunc(_expression));
             }
             until(not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ","));
             
@@ -516,7 +518,7 @@ function __FlowMethodize(_tokenArray)
                 var _i = 0;
                 repeat(__length)
                 {
-                    _array[_i] = __array[_i]();
+                    _array[@ _i] = __array[_i]();
                     ++_i;
                 }
                 
@@ -700,7 +702,7 @@ function __FlowMethodize(_tokenArray)
             if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "%"))
             {
                 var _number = __Number();
-                if (not is_numeric(_number)) return pointer_null;
+                if (is_ptr(_number)) return pointer_null;
                 
                 if (not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, "%"))
                 {
