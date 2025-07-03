@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"__FlowClass",
+  "%Name":"FlowProgEnd",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__FlowClass",
+  "name":"FlowProgEnd",
   "parent":{
-    "name":"(System)",
-    "path":"folders/Flow/(System).yy",
+    "name":"Program",
+    "path":"folders/Flow/Program.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

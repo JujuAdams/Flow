@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"__FlowBuildCurve",
+  "%Name":"FlowProgSetTime",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__FlowBuildCurve",
+  "name":"FlowProgSetTime",
   "parent":{
-    "name":"Builder",
-    "path":"folders/Flow/(System)/Builder.yy",
+    "name":"Program",
+    "path":"folders/Flow/Program.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

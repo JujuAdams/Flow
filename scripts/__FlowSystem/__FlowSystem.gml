@@ -1,6 +1,7 @@
 // Feather disable all
 
 #macro __FLOW_DEBUG_TOKENIZER  true
+#macro __FLOW_DEBUG_PROGRAM_BUILDER  true
 
 function __FlowSystem()
 {
@@ -13,6 +14,9 @@ function __FlowSystem()
         __precacheMap  = ds_map_create();
         __animCurveMap = ds_map_create();
         __functionMap  = ds_map_create();
+        
+        __programStack   = [];
+        __programCurrent = undefined;
         
         __executionContext = {
             __paramArray: [],

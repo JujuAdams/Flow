@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"FlowProgTargetVector",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"FlowProgTargetVector",
+  "parent":{
+    "name":"Program",
+    "path":"folders/Flow/Program.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

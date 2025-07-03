@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"__FlowBuildTime",
+  "%Name":"FlowProgTween",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__FlowBuildTime",
+  "name":"FlowProgTween",
   "parent":{
-    "name":"Builder",
-    "path":"folders/Flow/(System)/Builder.yy",
+    "name":"Program",
+    "path":"folders/Flow/Program.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -116,6 +116,8 @@ function __FlowMethodize(_tokenArray)
             },
             function()
             {
+                FlowProgBegin();
+                
                 var _array = __statementArray;
                 var _i = 0;
                 repeat(array_length(_array))
@@ -123,23 +125,25 @@ function __FlowMethodize(_tokenArray)
                     _array[_i]();
                     ++_i;
                 }
+                
+                return FlowProgEnd();
             });
         }
         
         //Statements are "lines" of instructions. Lines can only start with certain tokens:
-        // `time <expression>`
-        // `delay <expression>`
+        // `time <duration>`
+        // `delay <duration>`
         // `await` `await all` `await any`
         // `function(<arguments>)`
         // `<tween line>`
         static __Statement = function()
         {
             ////////
-            // `time <expression>`
+            // `time <duration>`
             ////////
             if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "time"))
             {
-                var _value = __Expression();
+                var _value = __Duration();
                 if (not is_ptr(_value))
                 {
                     return method({
@@ -147,7 +151,7 @@ function __FlowMethodize(_tokenArray)
                     },
                     function()
                     {
-                        //TODO
+                        FlowProgSetTime(__value());
                     });
                 }
                 else
@@ -157,11 +161,11 @@ function __FlowMethodize(_tokenArray)
             }
             
             ////////
-            // `delay <expression>`
+            // `delay <duration>`
             ////////
             if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "delay"))
             {
-                var _value = __Expression();
+                var _value = __Duration();
                 if (not is_ptr(_value))
                 {
                     return method({
@@ -169,7 +173,7 @@ function __FlowMethodize(_tokenArray)
                     },
                     function()
                     {
-                        //TODO
+                        FlowProgDelay(__value());
                     });
                 }
                 else
@@ -185,23 +189,17 @@ function __FlowMethodize(_tokenArray)
             {
                 if (__CheckAndConsume(__FLOW_TOKEN_BREAK) || __CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "all"))
                 {
-                    return method({
-                        
-                    },
-                    function()
+                    return function()
                     {
-                        //TODO
-                    });
+                        FlowProgAwaitAll();
+                    };
                 }
                 else if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "any"))
                 {
-                    return method({
-                        
-                    },
-                    function()
+                    return function()
                     {
-                        //TODO
-                    });
+                        FlowProgAwaitAny();
+                    };
                 }
                 else
                 {
@@ -212,7 +210,7 @@ function __FlowMethodize(_tokenArray)
             ///////
             // `function(<arguments>)`
             ///////
-            var _result = __FunctionCall();
+            var _result = __Function(true);
             if (not is_ptr(_result)) return _result;
             
             ///////
@@ -233,7 +231,7 @@ function __FlowMethodize(_tokenArray)
             var _target = __VariableOrTuple();
             if (is_ptr(_target)) return pointer_null;
             
-            if (__CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, "="))
+            if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "="))
             {
                 var _setValue = __Expression();
                 if (is_ptr(_setValue)) return pointer_null;
@@ -245,12 +243,12 @@ function __FlowMethodize(_tokenArray)
             
             //Accept any number of following process definitions, at least until we reach a break token
             var _processArray = [];
-            while(not __CheckAndConsume(__FLOW_TOKEN_STATE_BREAK))
+            while(not __CheckAndConsume(__FLOW_TOKEN_BREAK))
             {
-                if (not __CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, ">>")) return pointer_null;
+                if (not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ">>")) return pointer_null;
                 
                 var _process = __Process();
-                if (is_ptr()) return pointer_null;
+                if (is_ptr(_process)) return pointer_null;
                 
                 array_push(_processArray, _process);
             }
@@ -262,7 +260,20 @@ function __FlowMethodize(_tokenArray)
             },
             function()
             {
-                //TODO
+                __target();
+                
+                if (__setValue != undefined)
+                {
+                    FlowProgJump(0, __setValue());
+                }
+                
+                var _array = __processArray;
+                var _i = 0;
+                repeat(array_length(_array))
+                {
+                    _array[_i]();
+                    ++_i;
+                }
             });
         }
         
@@ -278,25 +289,11 @@ function __FlowMethodize(_tokenArray)
                 return pointer_null;
             }
             
-            var _vector = false;
             var _array  = [__Consume()];
             
-            if (__CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, ","))
-            {
-                //Building a list of parallel tracks to tween
-                do
-                {
-                    var _reference = __Reference();
-                    if (not is_ptr(_reference)) return pointer_null;
-                
-                    array_push(_array, _reference);
-                }
-                until(not __CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, ","));
-            }
-            else if (__CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, "&"))
+            if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "&"))
             {
                 //Building a vector to tween
-                _vector = true;
                 
                 do
                 {
@@ -305,17 +302,57 @@ function __FlowMethodize(_tokenArray)
                 
                     array_push(_array, _reference);
                 }
-                until(not __CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, "&"));
+                until(not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, "&"));
+                
+                return method({
+                    __array: _array,
+                },
+                function()
+                {
+                    var _array = array_create(__length, 0);
+                    
+                    var _i = 0;
+                    repeat(__length)
+                    {
+                        _array[_i] = __array[_i]();
+                        ++_i;
+                    }
+                    
+                    FlowProgTargetVector(_array);
+                });
             }
-            
-            return method({
-                __vector: _vector,
-                __array:  _array,
-            },
-            function()
+            else
             {
-                //TODO
-            });
+                if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, ","))
+                {
+                    //Building a list of parallel tracks to tween
+                    do
+                    {
+                        var _reference = __Reference();
+                        if (not is_ptr(_reference)) return pointer_null;
+                        
+                        array_push(_array, _reference);
+                    }
+                    until(not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ","));
+                }
+                
+                return method({
+                    __array: _array,
+                },
+                function()
+                {
+                    var _array = array_create(__length, 0);
+                    
+                    var _i = 0;
+                    repeat(__length)
+                    {
+                        _array[_i] = __array[_i]();
+                        ++_i;
+                    }
+                    
+                    FlowProgTargetVars(_array);
+                });
+            }
         }
         
         static __Reference = function()
@@ -337,24 +374,16 @@ function __FlowMethodize(_tokenArray)
         // `<curve> <duration> = <multiExpression>`  : curve interpolation (alternate mode)
         static __Process = function()
         {
-            var _mechanism = undefined;
-            
-            //Try to fit `+<multiExpression>`
+            //Try to fit `+<multiExpression>` first
             if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "+"))
             {
-                var _multiExpression = __MultiExpression();
-                if (not is_ptr(_multiExpression)) return pointer_null;
-                
-                _mechanism = method({
-                    __multiExpression: _multiExpression,
-                },
-                function()
-                {
-                    //TODO
-                });
+                var _approachSpeed = __MultiExpression();
+                if (not is_ptr(_approachSpeed)) return pointer_null;
             }
             else
             {
+                var _approachSpeed = undefined;
+                
                 //Try to fit `<curve> <duration>`
                 var _curve = __AnimationCurve();
                 if (not is_ptr(_curve))
@@ -371,19 +400,10 @@ function __FlowMethodize(_tokenArray)
                     var _curve = __AnimationCurve();
                     if (is_ptr(_curve)) _curve = undefined; //Curve definition is optional
                 }
-                
-                _mechanism = method({
-                    __duration: _duration,
-                    __curve: _curve,
-                },
-                function()
-                {
-                    //TODO
-                });
             }
             
             //Now try to match `= <multiExpression>`
-            if (not __CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, "="))
+            if (not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, "="))
             {
                 return pointer_null;
             }
@@ -391,14 +411,29 @@ function __FlowMethodize(_tokenArray)
             var _target = __MultiExpression();
             if (is_ptr(_target)) return pointer_null;
             
-            return method({
-                __mechanism: _mechanism,
-                __target:    _target,
-            },
-            function()
+            if (_approachSpeed != undefined)
             {
-                //TODO
-            });
+                return method({
+                    __approachSpeed: _approachSpeed,
+                    __target:        _target,
+                },
+                function()
+                {
+                    FlowProgApproach(__approachSpeed(), __target());
+                });
+            }
+            else
+            {
+                return method({
+                    __curve:    _curve,
+                    __duration: _duration,
+                    __target:   _target,
+                },
+                function()
+                {
+                    FlowProgTween(__curve(), __duration(), __target());
+                });
+            }
         }
         
         // `<expression>fr`
@@ -408,27 +443,30 @@ function __FlowMethodize(_tokenArray)
             var _expression = __Expression();
             if (is_ptr(_expression)) return pointer_null;
             
-            if (__CheckAndConsume(__FLOW_TOKEN_STATE_IDENIFIER, "ms"))
+            if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "fr"))
             {
-                var _milliseconds = false;
+                return method({
+                    __value: __EnsureFunc(_expression),
+                },
+                function()
+                {
+                    return __value();
+                });
             }
-            else if (__CheckAndConsume(__FLOW_TOKEN_STATE_IDENIFIER, "ms"))
+            else if (__CheckAndConsume(__FLOW_TOKEN_IDENTIFIER, "ms"))
             {
-                var _milliseconds = true;
+                return method({
+                    __value: __EnsureFunc(_expression),
+                },
+                function()
+                {
+                    return ceil(__value() / FLOW_TARGET_FPS);
+                });
             }
             else
             {
                 return pointer_null;
             }
-            
-            return method({
-                __expression:   __EnsureFunc(_expression),
-                __milliseconds: _milliseconds,
-            },
-            function()
-            {
-                //TODO
-            });
         }
         
         static __AnimationCurve = function()
@@ -465,28 +503,36 @@ function __FlowMethodize(_tokenArray)
                 
                 array_push(_array, _expression);
             }
-            until(not __CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, ","));
+            until(not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ","));
             
             return method({
                 __array: _array,
+                __length: array_length(_array),
             },
             function()
             {
-                //TODO
+                var _array = array_create(__length, 0);
+                
+                var _i = 0;
+                repeat(__length)
+                {
+                    _array[_i] = __array[_i]();
+                    ++_i;
+                }
+                
+                return _array;
             });
         }
         
         static __Expression = function()
         {
-            var _functionCall = __FunctionCall();
-            if (not is_ptr(_functionCall)) return _functionCall;
-            
             var _return = __AddSubtract();
             if (not is_ptr(_return)) return _return;
             
             return pointer_null;
         }
         
+        //Addition and subtraction operators
         static __AddSubtract = function()
         {
             var _left = __MultiplyDivide();
@@ -498,44 +544,28 @@ function __FlowMethodize(_tokenArray)
                     var _right = __MultiplyDivide(); //TODO - Filter out invalid datatypes
                     if (is_ptr(_right)) return pointer_null;
                     
-                    //Optimization - return a precalculated value if possible
-                    if (is_numeric(_left) && is_numeric(_right))
+                    return method({
+                        __left:  __EnsureFunc(_left),
+                        __right: __EnsureFunc(_right),
+                    },
+                    function()
                     {
-                        return (_left - _right);
-                    }
-                    else
-                    {
-                        return method({
-                            __left:  __EnsureFunc(_left),
-                            __right: __EnsureFunc(_right),
-                        },
-                        function()
-                        {
-                            return (__left() - __right());
-                        });
-                    }
+                        return (__left() - __right());
+                    });
                 }
                 else if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "+"))
                 {
                     var _right = __MultiplyDivide(); //TODO - Filter out invalid datatypes
                     if (is_ptr(_right)) return pointer_null;
                     
-                    //Optimization - return a precalculated value if possible
-                    if (is_numeric(_left) && is_numeric(_right))
+                    return method({
+                        __left:  __EnsureFunc(_left),
+                        __right: __EnsureFunc(_right),
+                    },
+                    function()
                     {
-                        _left = (_left + _right);
-                    }
-                    else
-                    {
-                        return method({
-                            __left:  __EnsureFunc(_left),
-                            __right: __EnsureFunc(_right),
-                        },
-                        function()
-                        {
-                            return (__left() + __right());
-                        });
-                    }
+                        return (__left() + __right());
+                    });
                 }
                 else
                 {
@@ -546,6 +576,7 @@ function __FlowMethodize(_tokenArray)
             return _left;
         }
         
+        //Multiplication and division operators
         static __MultiplyDivide = function()
         {
             var _left = __NegateNegative();
@@ -557,44 +588,28 @@ function __FlowMethodize(_tokenArray)
                     var _right = __NegateNegative(); //TODO - Filter out invalid datatypes
                     if (is_ptr(_right)) return pointer_null;
                     
-                    //Optimization - return a precalculated value if possible
-                    if (is_numeric(_left) && is_numeric(_right))
+                    return method({
+                        __left:  __EnsureFunc(_left),
+                        __right: __EnsureFunc(_right),
+                    },
+                    function()
                     {
-                        _left = (_left / _right);
-                    }
-                    else
-                    {
-                        return method({
-                            __left:  __EnsureFunc(_left),
-                            __right: __EnsureFunc(_right),
-                        },
-                        function()
-                        {
-                            return (__left() / __right());
-                        });
-                    }
+                        return (__left() / __right());
+                    });
                 }
                 else if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "*"))
                 {
                     var _right = __NegateNegative(); //TODO - Filter out invalid datatypes
                     if (is_ptr(_right)) return pointer_null;
                     
-                    //Optimization - return a precalculated value if possible
-                    if (is_numeric(_left) && is_numeric(_right))
+                    return method({
+                        __left:  __EnsureFunc(_left),
+                        __right: __EnsureFunc(_right),
+                    },
+                    function()
                     {
-                        _left = (_left * _right);
-                    }
-                    else
-                    {
-                        return method({
-                            __left:  __EnsureFunc(_left),
-                            __right: __EnsureFunc(_right),
-                        },
-                        function()
-                        {
-                            return (__left() * __right());
-                        });
-                    }
+                        return (__left() * __right());
+                    });
                 }
                 else
                 {
@@ -605,6 +620,9 @@ function __FlowMethodize(_tokenArray)
             return _left;
         }
         
+        //Unary operators
+        // `!x`
+        // `-x`
         static __NegateNegative = function()
         {
             if (__CheckAndConsume(__FLOW_TOKEN_SYMBOL, "!"))
@@ -656,6 +674,9 @@ function __FlowMethodize(_tokenArray)
         
         static __Primary = function()
         {
+            var _functionCall = __Function(false);
+            if (not is_ptr(_functionCall)) return _functionCall;
+            
             if (__Check(__FLOW_TOKEN_BOOL))
             {
                 return __Consume();
@@ -692,7 +713,15 @@ function __FlowMethodize(_tokenArray)
                 function()
                 {
                     static _executionContext = __FlowSystem().__executionContext;
-                    return _executionContext.__paramArray[__paramIndex];
+                    
+                    var _paramArray = _executionContext.__paramArray;
+                    
+                    if (__paramIndex >= array_length(_paramArray))
+                    {
+                        __FlowError($"No parameter passed for index {__paramIndex}");
+                    }
+                    
+                    return _paramArray[__paramIndex];
                 });
             }
             
@@ -709,7 +738,7 @@ function __FlowMethodize(_tokenArray)
                 return _expression;
             }
             
-            var _function = __FunctionCall();
+            var _function = __Function(false);
             if (not is_ptr(_function)) return _function;
             
             return pointer_null;
@@ -727,14 +756,9 @@ function __FlowMethodize(_tokenArray)
             }
         }
         
-        // `~function(<arguments>)`
         // `function(<arguments>)`
-        static __FunctionCall = function()
+        static __Function = function(_defer)
         {
-            var _startIndex = __index;
-            
-            var _dynamic = __CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, "~");
-            
             if (__Check(__FLOW_TOKEN_IDENTIFIER) && __CheckNext(__FLOW_TOKEN_SYMBOL, "("))
             {
                 var _functionName = __Consume();
@@ -755,11 +779,11 @@ function __FlowMethodize(_tokenArray)
                     do
                     {
                         var _expression = __Expression();
-                        if (not is_ptr(_expression)) return pointer_null;
+                        if (is_ptr(_expression)) return pointer_null;
                         
                         array_push(_argumentArray, _expression);
                     }
-                    until(not __CheckAndConsume(__FLOW_TOKEN_STATE_SYMBOL, ","));
+                    until(not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ","));
                     
                     if (not __CheckAndConsume(__FLOW_TOKEN_SYMBOL, ")"))
                     {
@@ -767,19 +791,52 @@ function __FlowMethodize(_tokenArray)
                     }
                 }
                 
-                return method({
-                    __dynamic: _dynamic,
-                    __function: _function,
-                    __argumentArray: _argumentArray,
-                },
-                function()
+                if (_defer)
                 {
-                    return method_call(__function, __argumentArray);
-                });
+                    return method({
+                        __function:      _function,
+                        __argumentArray: _argumentArray,
+                        __argumentCount: array_length(_argumentArray),
+                    },
+                    function()
+                    {
+                        var _array = array_create(__argumentCount, 0);
+                        
+                        var _i = 0;
+                        repeat(__argumentCount)
+                        {
+                            _array[@ _i] = __argumentArray[_i]();
+                            ++_i;
+                        }
+                        
+                        FlowProgExecute(__function, _array);
+                    });
+                }
+                else
+                {
+                    return method({
+                        __function:      _function,
+                        __argumentArray: _argumentArray,
+                        __argumentCount: array_length(_argumentArray),
+                    },
+                    function()
+                    {
+                        var _array = array_create(__argumentCount, 0);
+                        
+                        var _i = 0;
+                        repeat(__argumentCount)
+                        {
+                            _array[@ _i] = __argumentArray[_i]();
+                            ++_i;
+                        }
+                        
+                        return method_call(__function, _array);
+                    });
+                }
             }
             
-            __Jump(_startIndex);
             return pointer_null;
         }
+        
     })(_tokenArray)).__blockMethod;
 }

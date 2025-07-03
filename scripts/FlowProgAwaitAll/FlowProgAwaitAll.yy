@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"FlowProgAwaitAll",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"FlowProgAwaitAll",
+  "parent":{
+    "name":"Program",
+    "path":"folders/Flow/Program.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

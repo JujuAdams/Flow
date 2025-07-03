@@ -6,7 +6,7 @@
 #macro __FLOW_TOKEN_STATE_BLOCK_COMMENT  -2
 #macro __FLOW_TOKEN_STATE_LINE_COMMENT   -1
 #macro __FLOW_TOKEN_STATE_UNKNOWN         0
-#macro __FLOW_TOKEN_STATE_IDENIFIER       1
+#macro __FLOW_TOKEN_STATE_IDENTIFIER       1
 #macro __FLOW_TOKEN_STATE_STRING          2
 #macro __FLOW_TOKEN_STATE_NUMBER          3
 #macro __FLOW_TOKEN_STATE_SYMBOL          4
@@ -44,14 +44,14 @@ function __FlowTokenize(_string)
         _array[@ ord(":" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 58
         _array[@ ord(";" )] = __FLOW_TOKEN_STATE_BREAK;                                           // 59
         for(var _i = ord("<"); _i <= ord("@"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_SYMBOL;    // 60 ->  64
-        for(var _i = ord("A"); _i <= ord("Z"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_IDENIFIER; // 65 ->  90
+        for(var _i = ord("A"); _i <= ord("Z"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_IDENTIFIER; // 65 ->  90
         _array[@ ord("[" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 91
         _array[@ ord("\\")] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 92
         _array[@ ord("]" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 93
         _array[@ ord("^" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 94
-        _array[@ ord("_" )] = __FLOW_TOKEN_STATE_IDENIFIER;                                       // 95
+        _array[@ ord("_" )] = __FLOW_TOKEN_STATE_IDENTIFIER;                                       // 95
         _array[@ ord("`" )] = __FLOW_TOKEN_STATE_SYMBOL;                                          // 96
-        for(var _i = ord("a"); _i <= ord("z"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_IDENIFIER; // 97 -> 122
+        for(var _i = ord("a"); _i <= ord("z"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_IDENTIFIER; // 97 -> 122
         for(var _i = ord("{"); _i <= ord("~"); _i++) _array[@ _i] = __FLOW_TOKEN_STATE_SYMBOL;    //123 -> 126
         
         return _array;
@@ -107,7 +107,7 @@ function __FlowTokenize(_string)
                 array_push(_tokensArray,   __FLOW_TOKEN_BREAK, chr(_lastByte));
             break;
             
-            case __FLOW_TOKEN_STATE_IDENIFIER: //Variable / function
+            case __FLOW_TOKEN_STATE_IDENTIFIER: //Variable / function
                 if (_byte == ord("."))
                 {
                     _nextState = __FLOW_TOKEN_STATE_SYMBOL;
@@ -119,7 +119,7 @@ function __FlowTokenize(_string)
                     //If we have letters before numbers then the numbers are considered part of the variable name
                     if (_nextState == __FLOW_TOKEN_STATE_NUMBER)
                     {
-                        _nextState = __FLOW_TOKEN_STATE_IDENIFIER;
+                        _nextState = __FLOW_TOKEN_STATE_IDENTIFIER;
                     }
                 }
                 
