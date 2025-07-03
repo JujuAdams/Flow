@@ -15,13 +15,10 @@ function __FlowClassInstrTarget(_scope, _variableName) constructor
     
     
     
-    static __Start = function(_age)
-    {
-        __start = _age;
-    }
-    
     static __Update = function(_container, _age)
     {
+        __start ??= _age;
+        
         if (__moment >= array_length(__momentArray))
         {
             return __FLOW_RETURN_COMPLETE;

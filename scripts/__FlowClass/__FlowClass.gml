@@ -35,14 +35,15 @@ function __FlowClass(_scope) constructor
         var _i = 0;
         repeat(array_length(__pendingArray))
         {
-            if (__pendingArray[_i].__Update(self, __age) == __FLOW_RETURN_PENDING)
+            var _result = __pendingArray[_i].__Update(self, __age);
+            if (_result == __FLOW_RETURN_COMPLETE)
             {
-                _pending = true;
-                ++_i;
+                array_delete(__pendingArray, _i, 1);
             }
             else
             {
-                array_delete(__pendingArray, _i, 1);
+                _pending = true;
+                ++_i;
             }
         }
         
@@ -56,12 +57,12 @@ function __FlowClass(_scope) constructor
         while(__instruction < _length)
         {
             var _instruction = __instructionArray[__instruction];
-            _instruction.__Start(__age);
             
             var _result = _instruction.__Update(self, __age);
             if (_result == __FLOW_RETURN_WAIT)
             {
-                break;
+                array_push(__pendingArray, _instruction);
+                return false;
             }
             else if (_result == __FLOW_RETURN_PENDING)
             {

@@ -1,5 +1,6 @@
 // Feather disable all
 
+/// @param scope
 /// @param variableName
 
 function __FlowClassInstrVector(_scope, _variableName) constructor
@@ -14,13 +15,10 @@ function __FlowClassInstrVector(_scope, _variableName) constructor
     
     
     
-    static __Start = function(_age)
-    {
-        __start = _age;
-    }
-    
     static __Update = function(_container, _age)
     {
+        __start ??= _age;
+        
         if (__moment >= array_length(__momentArray))
         {
             return __FLOW_RETURN_COMPLETE;
@@ -34,7 +32,7 @@ function __FlowClassInstrVector(_scope, _variableName) constructor
                 return __FLOW_RETURN_COMPLETE;
             }
             
-            _result = __momentArray[__moment](__scope, __variableName, _age);
+            _result = __momentArray[__moment](__scope, __variableName, _age - __start);
             if (_result)
             {
                 __start = _age;
@@ -44,8 +42,6 @@ function __FlowClassInstrVector(_scope, _variableName) constructor
                 {
                     return __FLOW_RETURN_COMPLETE;
                 }
-                
-                __momentArray[__moment].__startValue = __scope[$ __variableName];
             }
         }
         
@@ -63,7 +59,9 @@ function __FlowClassInstrVector(_scope, _variableName) constructor
             },
             function(_scope, _variableName, _age)
             {
-                return lerp(__startValue, __target, clamp(_age / __duration, 0, 1));
+                __startValue ??= _scope[$ _variableName];
+                _scope[$ _variableName] = lerp(__startValue, __target, clamp(_age / __duration, 0, 1));
+                return (_age >= __duration);
             }));
         }
         else
@@ -76,7 +74,9 @@ function __FlowClassInstrVector(_scope, _variableName) constructor
             },
             function(_scope, _variableName, _age)
             {
-                return lerp(__startValue, __target, animcurve_channel_evaluate(__channel, clamp(_age / __duration, 0, 1)));
+                __startValue ??= _scope[$ _variableName];
+                _scope[$ _variableName] = lerp(__startValue, __target, animcurve_channel_evaluate(__channel, clamp(_age / __duration, 0, 1)));
+                return (_age >= __duration);
             }));
         }
     }
@@ -105,7 +105,7 @@ function __FlowClassInstrVector(_scope, _variableName) constructor
         {
             if (_age >= __delay)
             {
-                _scope[$ _variableName] = __delay;
+                _scope[$ _variableName] = __target;
                 return true;
             }
             

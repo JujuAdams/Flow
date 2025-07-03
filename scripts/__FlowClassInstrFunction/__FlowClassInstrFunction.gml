@@ -10,11 +10,6 @@ function __FlowClassInstrFunction(_function, _argumentArray) constructor
     
     
     
-    static __Start = function(_age)
-    {
-        //Do nothing
-    }
-    
     static __Update = function(_container, _age)
     {
         method_call(__function, __argumentArray);
