@@ -116,6 +116,13 @@ function __FlowMethodize(_tokenArray)
             },
             function(_scope)
             {
+                static _system = __FlowSystem();
+                
+                if (not _system.__usingGo)
+                {
+                    __FlowError("Must only execute Flow programs using `FlowGo()`");
+                }
+                
                 FlowProgBegin(_scope);
                 
                 var _array = __statementArray;

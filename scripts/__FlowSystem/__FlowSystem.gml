@@ -11,6 +11,8 @@ function __FlowSystem()
     _system = {};
     with(_system)
     {
+        __usingGo = false;
+        
         __precacheMap  = ds_map_create();
         __animCurveMap = ds_map_create();
         __functionMap  = ds_map_create();
