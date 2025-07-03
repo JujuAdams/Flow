@@ -158,7 +158,7 @@ function __FlowMethodize(_tokenArray)
                     },
                     function()
                     {
-                        FlowProgSetTime(__value());
+                        FlowProgSetTime(__value(), false);
                     });
                 }
                 else
@@ -180,7 +180,7 @@ function __FlowMethodize(_tokenArray)
                     },
                     function()
                     {
-                        FlowProgDelay(__value());
+                        FlowProgDelay(__value(), false);
                     });
                 }
                 else
@@ -440,7 +440,7 @@ function __FlowMethodize(_tokenArray)
                 },
                 function()
                 {
-                    FlowProgTween(__curve(), __duration(), __target());
+                    FlowProgTween(__curve(), __duration(), __target(), false);
                 });
             }
         }
@@ -469,7 +469,7 @@ function __FlowMethodize(_tokenArray)
                 },
                 function()
                 {
-                    return ceil(__value() / FLOW_TARGET_FRAME_TIME);
+                    return __FlowMsToFrames(__value());
                 });
             }
             else

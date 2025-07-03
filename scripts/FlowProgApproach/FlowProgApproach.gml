@@ -1,5 +1,12 @@
 // Feather disable all
 
+/// N.B. This function is available to manually build programs using individual instructions. You
+///      probably don't want to build programs manually. Instead, you should use `FlowGo()` or
+///      `FlowCompile()`.
+/// 
+/// Linearly interpolates a value towards a target at the given speed per frame. The speed value
+/// ignores the sign (negative or positive).
+/// 
 /// @param speedOrArray
 /// @param targetOrArray
 

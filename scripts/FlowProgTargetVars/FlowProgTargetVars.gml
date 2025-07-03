@@ -1,5 +1,12 @@
 // Feather disable all
 
+/// N.B. This function is available to manually build programs using individual instructions. You
+///      probably don't want to build programs manually. Instead, you should use `FlowGo()` or
+///      `FlowCompile()`.
+/// 
+/// Sets the variables to target for subsequent tweening instructions. You may soecify one variable
+/// or multiple variables in an array.
+/// 
 /// @param variableOrArray
 
 function FlowProgTargetVars(_variableOrArray)
